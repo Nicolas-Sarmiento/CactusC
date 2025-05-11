@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "utils/read_file.h"
 #include "lexer/lexer.h"
-
+#include "error_handler/error_handler.h"
+#include "lexer/token.h"
 
 int main(int argc, char * argv[]){
   if( argc != 3 ){
@@ -13,7 +14,7 @@ int main(int argc, char * argv[]){
   char *source_name = argv[1];
   char *output_name = argv[2];
 
-  printf("1. Compiling %s to %s\n", source_name, output_name);
+  printf("Compiling %s to %s\n", source_name, output_name);
 
   size_t lines = 0;
   char **source_lines = read_file(source_name, &lines);
@@ -26,9 +27,11 @@ int main(int argc, char * argv[]){
     printf("%s", source_lines[i]);
   }
 
-  lexer(source_lines, lines);
-
+  Token* tokens;
+  size_t num_tokens = 0;
+  Result status = lexer(source_lines, lines, &tokens, &num_tokens);
+  
+  free(tokens); 
   free_lines(source_lines, lines);
-
   return 0;
 }
