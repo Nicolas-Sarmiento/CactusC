@@ -8,5 +8,5 @@ include_directories(src)
 
 file(GLOB_RECURSE SOURCES "src/main.c" "src/**/*.c")
 
-add_executable(tuna ${SOURCES})
+add_executable(ctuna ${SOURCES})
 

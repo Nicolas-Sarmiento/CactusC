@@ -1,26 +1,104 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "lexer/lexer.h"
 #include "error_handler/error_handler.h"
-#include "lexer/token.h"
+#include "lexer/lexer.h"
+#include "lexer/regex.h"
 
 #define N_TOKENS 1024
 
+
+
+
 Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size ){
-    *tokenList = ( Token * ) malloc( N_TOKENS * sizeof( Token) );
+   
     size_t token_pos = 0;
-    size_t char_i;
+    size_t tokenListSize = N_TOKENS;
+    *tokenList = ( Token * ) malloc( tokenListSize * sizeof( Token) );
+    size_t char_i, token_i, token_size;
     for(int i = 0; i < line_count; ++i ){
         char* line = lines[i];
+        token_i = 0;
         char_i = 0;
-
+        token_size = 1024;
+        char* next_token = (char * ) malloc( token_size );
         while ( line[char_i] != '\0') {
-            printf("%c ", line[char_i]);
-            //CONTINUE ...
+
+            if( token_i >= token_size ){
+                token_size *= 2;
+                next_token = (char * ) realloc(next_token, token_size);
+            }
+            if( token_pos >= tokenListSize ){
+                tokenListSize *= 2;
+                *tokenList = (Token * ) realloc(*tokenList, tokenListSize);
+            }
+
+            if( is_not_sep(line[char_i])){
+                next_token[token_i] = line[char_i];
+                ++token_i;
+                ++char_i;
+                continue;
+            }
+            if (next_token[0] != '\0') {
+                next_token[token_i] = '\0';
+                printf("next : %s\n" ,next_token);
+                Token_type tokenType = getTokenType(next_token);
+                if( tokenType == INVALID_TOKEN ){
+                    //improve message
+                    return (Result) {.code=ERR_LEXICAL, .message="Invalid token at line x."};
+                }
+                (*tokenList)[token_pos].type = tokenType;
+                if ( tokenType == TOKEN_LITERAL || tokenType == TOKEN_ID){
+                    (*tokenList)[token_pos].value = strdup(next_token);
+                }else if( tokenType == TOKEN_NUMBER ){
+                    (*tokenList)[token_pos].number = atoi(next_token);
+                }
+                token_pos++;
+            }
+            
+
+            if( line[char_i] != ' ' && line[char_i] != '\n' ){
+                char tmp[3];
+                int ix = 0;
+                tmp[ix++] = line[char_i];
+                if( is_double_op(line[char_i]) && line[char_i+1] != '\0' ){
+                    if( (line[char_i] == '!' && line[char_i+1] == '=') || (line[char_i] != '!' && (line[char_i] == line[char_i + 1]))){
+                        tmp[ix++] = line[char_i+1];
+                        char_i++;
+                    }
+                }
+                tmp[ix] = '\0';
+                Token_type type = getTokenType(tmp);
+                (*tokenList)[token_pos++].type = type;
+
+            }
+            next_token[0] = '\0';
+            token_i = 0;
             ++char_i;
         }
+
+        if( next_token[0] != '\0' ){
+            next_token[token_i] = '\0';
+            Token_type tokenType = getTokenType(next_token);
+            if( tokenType == INVALID_TOKEN ){
+                //improve message
+                return (Result) {.code=ERR_LEXICAL, .message="Invalid token at line x."};
+            }
+            (*tokenList)[token_pos].type = tokenType;
+            if ( tokenType == TOKEN_LITERAL || tokenType == TOKEN_ID){
+                (*tokenList)[token_pos].value = strdup(next_token);
+            }else if( tokenType == TOKEN_NUMBER ){
+                (*tokenList)[token_pos].number = atoi(next_token);
+            }
+            token_pos++;
+        }
+
+
+        free(next_token);
+    
     }
+    *size = token_pos;
     Result result = { .code = OK };
     return result;
 }
+

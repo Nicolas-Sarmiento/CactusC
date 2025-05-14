@@ -27,10 +27,17 @@ int main(int argc, char * argv[]){
     printf("%s", source_lines[i]);
   }
 
-  Token* tokens;
+  Token* tokens = NULL;
   size_t num_tokens = 0;
   Result status = lexer(source_lines, lines, &tokens, &num_tokens);
-  
+  if( status.code != OK ){
+    print_error_message(status);
+    return 1;
+  }
+
+  for(size_t i = 0; i < num_tokens; ++i ){
+    printf("< %d , %s, %d >\n", tokens[i].type, tokens[i].value, tokens[i].number );
+  }
   free(tokens); 
   free_lines(source_lines, lines);
   return 0;

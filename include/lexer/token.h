@@ -3,16 +3,35 @@
 
 typedef enum Token_type_enum {
     TOKEN_EOF,
-    TOKEN_IDENTIFIER,
+    TOKEN_ID,
+    TOKEN_INT,
+    TOKEN_IF,
+    TOKEN_WHILE,
+    TOKEN_RETURN,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_TIMES,
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_LP,
+    TOKEN_RP,
+    TOKEN_LB,
+    TOKEN_RB,
+    TOKEN_EQ,
+    TOKEN_NEQ,
+    TOKEN_GT,
+    TOKEN_NOT,
+    TOKEN_ASSG,
+    TOKEN_LITERAL,
     TOKEN_NUMBER,
-    TOKEN_KEYWORD,
-    TOKEN_OPERATOR,
-    TOKEN_LITERAL
+    TOKEN_SMCL,
+    INVALID_TOKEN
 } Token_type;
 
 typedef struct Token_struct {
     Token_type type;
     char * value;
+    int number;
 } Token;
 
 #endif // TOKEN_H
