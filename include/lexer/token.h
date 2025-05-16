@@ -25,7 +25,8 @@ typedef enum Token_type_enum {
     TOKEN_LITERAL,
     TOKEN_NUMBER,
     TOKEN_SMCL,
-    INVALID_TOKEN
+    INVALID_TOKEN,
+    TOTAL_TOKENS,
 } Token_type;
 
 typedef struct Token_struct {
@@ -33,5 +34,7 @@ typedef struct Token_struct {
     char * value;
     int number;
 } Token;
+
+void printToken( Token token);
 
 #endif // TOKEN_H

@@ -36,7 +36,7 @@ int main(int argc, char * argv[]){
   }
 
   for(size_t i = 0; i < num_tokens; ++i ){
-    printf("< %d , %s, %d >\n", tokens[i].type, tokens[i].value, tokens[i].number );
+    printToken(tokens[i]);
   }
   free(tokens); 
   free_lines(source_lines, lines);

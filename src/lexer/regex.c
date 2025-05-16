@@ -1,6 +1,7 @@
 #include "lexer/regex.h"
 #include "string.h"
 #include <ctype.h>
+#include <stdio.h>
 
 const TokenPair tokenTable[] ={
     {"if", TOKEN_IF},
@@ -28,30 +29,30 @@ const size_t size = sizeof(tokenTable)/sizeof(tokenTable[0]);
 int valid_char( char c );
 
 Token_type getTokenType(const char* key) {
-    // Verificar si la cadena no contiene caracteres no válidos
+
+    if (key[0] == '"') {
+        size_t len = strlen(key);
+        if (key[len - 1] == '"') {
+            return TOKEN_LITERAL;
+        } else {
+            return INVALID_TOKEN;  
+        }
+    }
+
     for (const char* k = key; *k; ++k) {
         if (!valid_char(*k)) return INVALID_TOKEN;
     }
 
-    // Comparar con la tabla de tokens
     for (size_t i = 0; i < size; i++) {
         if (strcmp(tokenTable[i].key, key) == 0) {
             return tokenTable[i].value;
         }
     }
 
-    // Verificar si es un literal (cadena entre comillas)
-    if (key[0] == '"') {
-        size_t len = strlen(key);
-        if (key[len - 1] == '"') {
-            return TOKEN_LITERAL;
-        } else {
-            return INVALID_TOKEN;  // El token no es válido si no cierra la comilla
-        }
-    }
 
-    // Verificar si es un identificador (ID) o número
-    int is_number = 1;  // Suponemos que es un número hasta que se demuestre lo contrario
+
+    int is_number = 1;  
+    printf("%zu \n", strlen(key));
     for (size_t i = 0; i < strlen(key); i++) {
         if (!isdigit(key[i])) {
             is_number = 0;
@@ -62,7 +63,7 @@ Token_type getTokenType(const char* key) {
     if (is_number) {
         return TOKEN_NUMBER;
     } else {
-        return TOKEN_ID;  // Si no es un número, es un identificador
+        return TOKEN_ID; 
     }
 }
 
@@ -76,7 +77,7 @@ int valid_char(char c )  {
 }
 
 int is_not_sep(char c){
-    char specialChars[] = {'\n', '+', '-', '*', '/', ' ', '&', '|', '=', ';', '(', ')', '!', '>','{', '}'};
+    char specialChars[] = {'\n', '+', '-', '*', '/', ' ', '&', '|', '=', ';', '(', ')', '!', '>','{', '}', '\t'};
     for (size_t i = 0; i < sizeof(specialChars); ++i) {
         if (c == specialChars[i]) {
             return 0; 

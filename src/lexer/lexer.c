@@ -8,20 +8,20 @@
 #define N_TOKENS 1024
 
 
-
-
 Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size ){
    
     size_t token_pos = 0;
     size_t tokenListSize = N_TOKENS;
     *tokenList = ( Token * ) malloc( tokenListSize * sizeof( Token) );
     size_t char_i, token_i, token_size;
+    int literal_flag = 0;
     for(int i = 0; i < line_count; ++i ){
         char* line = lines[i];
         token_i = 0;
         char_i = 0;
         token_size = 1024;
         char* next_token = (char * ) malloc( token_size );
+        literal_flag = 0;
         while ( line[char_i] != '\0') {
 
             if( token_i >= token_size ){
@@ -33,13 +33,14 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
                 *tokenList = (Token * ) realloc(*tokenList, tokenListSize);
             }
 
-            if( is_not_sep(line[char_i])){
+            if( is_not_sep(line[char_i]) || literal_flag){
                 next_token[token_i] = line[char_i];
+                if (next_token[token_i] == '"') literal_flag = !literal_flag;
                 ++token_i;
                 ++char_i;
                 continue;
             }
-            if (next_token[0] != '\0') {
+            if (token_i > 0) {
                 next_token[token_i] = '\0';
                 printf("next : %s\n" ,next_token);
                 Token_type tokenType = getTokenType(next_token);
@@ -57,7 +58,7 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
             }
             
 
-            if( line[char_i] != ' ' && line[char_i] != '\n' ){
+            if( line[char_i] != ' ' && line[char_i] != '\n' && line[char_i] != '\t'){
                 char tmp[3];
                 int ix = 0;
                 tmp[ix++] = line[char_i];
@@ -77,7 +78,7 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
             ++char_i;
         }
 
-        if( next_token[0] != '\0' ){
+        if( token_i > 0 ){
             next_token[token_i] = '\0';
             Token_type tokenType = getTokenType(next_token);
             if( tokenType == INVALID_TOKEN ){
