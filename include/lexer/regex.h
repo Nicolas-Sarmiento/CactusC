@@ -1,6 +1,7 @@
-#include "lexer/token.h"
+
 #ifndef REGEX_H
 #define REGEX_H
+#include "lexer/token.h"
 
 typedef struct token_pair {
     char* key;

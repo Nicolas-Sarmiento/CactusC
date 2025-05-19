@@ -1,6 +1,8 @@
 #ifndef ERROR_HANDLER_H
 #define ERROR_HANDLER_H
 
+#include <string.h>
+
 typedef enum Status{
    OK,
    ERR_SYNTAX,

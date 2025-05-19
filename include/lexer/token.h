@@ -29,6 +29,8 @@ typedef enum Token_type_enum {
     TOTAL_TOKENS,
 } Token_type;
 
+
+
 typedef struct Token_struct {
     Token_type type;
     char * value;
@@ -36,5 +38,5 @@ typedef struct Token_struct {
 } Token;
 
 void printToken( Token token);
-
+const char* typeToStr( Token_type type );
 #endif // TOKEN_H

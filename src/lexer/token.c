@@ -30,3 +30,7 @@ const char* tokentypes[] = {
 void printToken( Token token){
     printf("<%s, %s, %d >\n", tokentypes[token.type], token.value, token.number);
 }
+
+const char* typeToStr( Token_type type ){
+    return tokentypes[type];
+}

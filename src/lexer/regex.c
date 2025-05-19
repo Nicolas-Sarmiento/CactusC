@@ -49,10 +49,7 @@ Token_type getTokenType(const char* key) {
         }
     }
 
-
-
     int is_number = 1;  
-    printf("%zu \n", strlen(key));
     for (size_t i = 0; i < strlen(key); i++) {
         if (!isdigit(key[i])) {
             is_number = 0;

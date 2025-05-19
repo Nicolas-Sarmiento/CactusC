@@ -42,11 +42,13 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
             }
             if (token_i > 0) {
                 next_token[token_i] = '\0';
-                printf("next : %s\n" ,next_token);
                 Token_type tokenType = getTokenType(next_token);
                 if( tokenType == INVALID_TOKEN ){
-                    //improve message
-                    return (Result) {.code=ERR_LEXICAL, .message="Invalid token at line x."};
+                    Result r;
+                    r.code = ERR_LEXICAL;
+                    char * base = "Unexpectede token at line ";
+                    sprintf(r.message, "%s%d", base, i);
+                    return r;
                 }
                 (*tokenList)[token_pos].type = tokenType;
                 if ( tokenType == TOKEN_LITERAL || tokenType == TOKEN_ID){
@@ -102,4 +104,3 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
     Result result = { .code = OK };
     return result;
 }
-
