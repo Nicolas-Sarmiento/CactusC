@@ -2,7 +2,8 @@
 #define ASTNODE_H
 
 typedef enum {
-    AST_INT_LITERAL,
+    AST_NUMBER,
+    AST_LITERAL,
     AST_VAR_DECL,
     AST_VAR,
     AST_BINARY_OP,
@@ -29,7 +30,7 @@ typedef struct ASTNode {
         // Literales
         struct {
             char* value;
-        } int_literal;
+        } str_literal;
 
         // x = expr;
         struct {
@@ -49,7 +50,7 @@ typedef struct ASTNode {
 
         // expr op expr
         struct {
-            char op; // '+', '-', '*', '/', etc.
+            char* op; // '+', '-', '*', '/', etc.
             struct ASTNode* left;
             struct ASTNode* right;
         } binary_op;
@@ -60,11 +61,11 @@ typedef struct ASTNode {
             struct ASTNode* operand;
         } unary_op;
 
-        // if (cond) { then_branch } else { else_branch }
+        // if (cond) { then_branch } 
         struct {
             struct ASTNode* condition;
             struct ASTNode* then_branch;
-            struct ASTNode* else_branch;
+           
         } if_stmt;
 
         // while (cond) { body }
@@ -84,18 +85,32 @@ typedef struct ASTNode {
             int count;
         } block;
 
-        // función main() { ... }
+        // int main() { ... }
         struct {
-            char* name; // solo usarás "main"
+            char* name; 
             struct ASTNode* body;
         } function_def;
 
-        // expresión sola como sentencia: expr;
+        
         struct {
             struct ASTNode* expr;
         } expr_stmt;
     };
 } ASTNode;
 
+
+//Definir nodos
+ASTNode* new_number(int value);
+ASTNode* new_str_literal( const char* literal );
+ASTNode* new_assign( const char* literal, ASTNode* value );
+ASTNode* new_var_decl( const char* name );
+ASTNode* new_binary_op( const char* op, ASTNode* left, ASTNode* right );
+ASTNode* new_unary_op( const char op, ASTNode* operand );
+ASTNode* new_if_stmt( ASTNode* condition, ASTNode* body );
+ASTNode* new_while_stmt( ASTNode* condition, ASTNode* body);
+ASTNode* new_print( ASTNode* expression);
+ASTNode* new_block_stmt( ASTNode** staments, int count );
+ASTNode* new_fun_def( const char* name, ASTNode* body);
+ASTNode* new_stmt( ASTNode* expression );
 
 #endif
