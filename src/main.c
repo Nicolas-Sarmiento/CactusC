@@ -36,11 +36,16 @@ int main(int argc, char * argv[]){
     return 1;
   }
 
+
+  for(size_t i = 0; i < num_tokens; i++){
+    printToken(tokens[i]);
+  }
+
   TokenStream stream;
   stream.tokens = tokens;
   stream.pos = 0;
   stream.lenght = num_tokens;
-  
+  printf("----- AST -----\n");
   printToken(peek(&stream));
 
   free(tokens); 

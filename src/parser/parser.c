@@ -16,9 +16,6 @@ ParseResult* parse_stmt( TokenStream* stream){
 
 }
 
-ParseResult* parse_stmts( TokenStream* stream){
-
-}
 
 ParseResult* parse_var_init( TokenStream* stream){
 

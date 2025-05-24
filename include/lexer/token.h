@@ -11,6 +11,7 @@ typedef enum Token_type_enum {
     TOKEN_PLUS,
     TOKEN_MINUS,
     TOKEN_TIMES,
+    TOKEN_DIV,
     TOKEN_AND,
     TOKEN_OR,
     TOKEN_LP,
