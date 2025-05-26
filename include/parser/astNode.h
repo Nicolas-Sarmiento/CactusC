@@ -1,6 +1,6 @@
 #ifndef ASTNODE_H
 #define ASTNODE_H
-
+#include <stdlib.h>
 typedef enum {
     AST_NUMBER,
     AST_LITERAL,
@@ -15,7 +15,8 @@ typedef enum {
     AST_BLOCK,
     AST_FUNCTION_CALL,
     AST_FUNCTION_DEF,
-    AST_EXPR_STMT
+    AST_RETURN,
+    AST_EXPR_STMT,
 } ASTNodeType;
 
 typedef struct ASTNode {
@@ -42,6 +43,7 @@ typedef struct ASTNode {
         struct {
             char* name;
         } var_decl;
+
 
         // usar variable
         struct {
@@ -82,7 +84,7 @@ typedef struct ASTNode {
         // secuencia de sentencias
         struct {
             struct ASTNode** statements;
-            int count;
+            size_t count;
         } block;
 
         // int main() { ... }
@@ -91,7 +93,7 @@ typedef struct ASTNode {
             struct ASTNode* body;
         } function_def;
 
-        
+        //return
         struct {
             struct ASTNode* expr;
         } expr_stmt;
@@ -103,14 +105,17 @@ typedef struct ASTNode {
 ASTNode* new_number(int value);
 ASTNode* new_str_literal( const char* literal );
 ASTNode* new_assign( const char* literal, ASTNode* value );
-ASTNode* new_var_decl( const char* name );
+ASTNode* new_var_decl( const char* name, ASTNode* value );
 ASTNode* new_binary_op( const char* op, ASTNode* left, ASTNode* right );
 ASTNode* new_unary_op( const char op, ASTNode* operand );
 ASTNode* new_if_stmt( ASTNode* condition, ASTNode* body );
 ASTNode* new_while_stmt( ASTNode* condition, ASTNode* body);
 ASTNode* new_print( ASTNode* expression);
-ASTNode* new_block_stmt( ASTNode** staments, int count );
+ASTNode* new_block_stmt( ASTNode** staments, size_t count );
 ASTNode* new_fun_def( const char* name, ASTNode* body);
 ASTNode* new_stmt( ASTNode* expression );
+ASTNode* new_return( ASTNode* expression );
+
+void free_ast(ASTNode* node);
 
 #endif

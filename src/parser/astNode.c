@@ -24,10 +24,11 @@ ASTNode* new_assign( const char* literal, ASTNode* value ){
     return node;
 }
 
-ASTNode* new_var_decl( const char* name ){
+ASTNode* new_var_decl( const char* name, ASTNode* value ){
     ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
     node->type = AST_VAR_DECL;
-    node->var_decl.name = strdup(name);
+    node->assign.name = strdup(name);
+    node->assign.expr = value;
     return node;
 }
 
@@ -71,7 +72,7 @@ ASTNode* new_print( ASTNode* expression){
     return node;
 }
 
-ASTNode* new_block_stmt( ASTNode** staments, int count ){
+ASTNode* new_block_stmt( ASTNode** staments, size_t count ){
     ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
     node->type = AST_BLOCK;
     node->block.statements = staments;
@@ -92,4 +93,14 @@ ASTNode* new_stmt( ASTNode* expression ){
     node->type = AST_EXPR_STMT;
     node->expr_stmt.expr = expression;
     return node;
+}
+ASTNode* new_return( ASTNode* expression ){
+    ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
+    node->type = AST_RETURN;
+    node->expr_stmt.expr = expression;
+    return node;
+}
+
+void free_ast(ASTNode* node){
+
 }

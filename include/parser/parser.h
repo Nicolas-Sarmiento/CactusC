@@ -12,7 +12,7 @@ typedef struct parseresult{
 } ParseResult;
 
 
-ParseResult* parse_program(TokenStream* stream);
+ParseResult parse_program(TokenStream* stream);
 
 
 #endif

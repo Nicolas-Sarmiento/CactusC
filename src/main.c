@@ -5,6 +5,7 @@
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 #include "parser/tokenstream.h"
+#include "parser/parser.h"
 
 int main(int argc, char * argv[]){
   if( argc != 3 ){
@@ -24,29 +25,26 @@ int main(int argc, char * argv[]){
     return 1;
   }
 
-  for( size_t i = 0; i < lines; i++ ){
-    printf("%s", source_lines[i]);
-  }
-
   Token* tokens = NULL;
   size_t num_tokens = 0;
   Result status = lexer(source_lines, lines, &tokens, &num_tokens);
   if( status.code != OK ){
     print_error_message(status);
+    free_lines(source_lines, lines);
     return 1;
-  }
-
-
-  for(size_t i = 0; i < num_tokens; i++){
-    printToken(tokens[i]);
   }
 
   TokenStream stream;
   stream.tokens = tokens;
   stream.pos = 0;
   stream.lenght = num_tokens;
-  printf("----- AST -----\n");
-  printToken(peek(&stream));
+  
+  
+  ParseResult ast = parse_program(&stream);
+  if( ast.result.code != OK ){
+    print_error_message(ast.result);
+  }
+
 
   free(tokens); 
   free_lines(source_lines, lines);

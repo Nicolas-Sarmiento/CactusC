@@ -8,10 +8,13 @@ void print_error_message(struct result status){
         printf("OK\n");
         return;
     case ERR_SYNTAX:
+        printf("Syntax Error!\n");
         break;
     case ERR_LEXICAL:
+        printf("Lexical error!\n");
         break;
     case ERR_SEMANTICAL:
+        printf("Semantical error!\n");
         break;
     default:
         printf("Err: No ERROR CODE found!\n");

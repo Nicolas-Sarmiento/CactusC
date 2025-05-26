@@ -29,7 +29,7 @@ int check (  TokenStream * stream, Token_type type ) {
 
 Result expect ( TokenStream * stream, Token_type type ) {
     Result r;
-    if( check(stream, type) ){
+    if( !check(stream, type) ){
         r.code = ERR_SYNTAX;
         char * base = "Expected a token of type ";
         const char* strType = typeToStr(type);
