@@ -9,6 +9,12 @@ ASTNode* new_number(int value){
     return node;
 }
 
+ASTNode* new_id( const char* literal ){
+    ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
+    node->type = AST_ID;
+    node->str_literal.value = strdup(literal);
+    return node;
+}
 ASTNode* new_str_literal( const char* literal ){
     ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
     node->type = AST_LITERAL;
@@ -100,7 +106,80 @@ ASTNode* new_return( ASTNode* expression ){
     node->expr_stmt.expr = expression;
     return node;
 }
+ASTNode* new_expr( ASTNode* expression ){
+    ASTNode* node = ( ASTNode* )malloc(sizeof(ASTNode));
+    node->type = AST_EXPR_STMT;
+    node->expr_stmt.expr = expression;
+    return node;
+}
 
-void free_ast(ASTNode* node){
 
+void free_ast(ASTNode* node) {
+    if (node == NULL) return;
+
+    switch (node->type) {
+        case AST_NUMBER:
+            break;
+
+        case AST_LITERAL:
+            free(node->str_literal.value);
+            break;
+
+        case AST_ASSIGN:
+            free(node->assign.name);
+            free_ast(node->assign.expr);
+            break;
+
+        case AST_VAR_DECL:
+            free(node->var_decl.name);
+            break;
+
+        case AST_VAR:
+            free(node->var.name);
+            break;
+
+        case AST_BINARY_OP:
+            free(node->binary_op.op);
+            free_ast(node->binary_op.left);
+            free_ast(node->binary_op.right);
+            break;
+
+        case AST_UNARY_OP:
+            free_ast(node->unary_op.operand);
+            break;
+
+        case AST_IF:
+            free_ast(node->if_stmt.condition);
+            free_ast(node->if_stmt.then_branch);
+            break;
+
+        case AST_WHILE:
+            free_ast(node->while_stmt.condition);
+            free_ast(node->while_stmt.body);
+            break;
+
+        case AST_PRINT:
+            free_ast(node->print_stmt.expr);
+            break;
+
+        case AST_BLOCK:
+            for (size_t i = 0; i < node->block.count; ++i) {
+                free_ast(node->block.statements[i]);
+            }
+            free(node->block.statements);
+            break;
+
+        case AST_FUNCTION_DEF:
+            free(node->function_def.name);
+            free_ast(node->function_def.body);
+            break;
+
+        case AST_EXPR_STMT:
+            free_ast(node->expr_stmt.expr);
+            break;
+
+
+    }
+
+    free(node);
 }

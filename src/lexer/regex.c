@@ -7,6 +7,7 @@ const TokenPair tokenTable[] ={
     {"if", TOKEN_IF},
     {"while", TOKEN_WHILE},
     {"int", TOKEN_INT},
+    {"return", TOKEN_RETURN},
     {"+", TOKEN_PLUS},
     {"-", TOKEN_MINUS},
     {"*", TOKEN_TIMES},
@@ -73,7 +74,7 @@ int valid_char(char c )  {
            c == '&' || c == '!' || 
            c == '+' || c == '*' || 
            c == ';' || c =='"'  || 
-           c == '>' || c == '/';
+           c == '>' || c == '/' || c == '-';
 }
 
 int is_not_sep(char c){

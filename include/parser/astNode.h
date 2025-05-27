@@ -3,6 +3,7 @@
 #include <stdlib.h>
 typedef enum {
     AST_NUMBER,
+    AST_ID,
     AST_LITERAL,
     AST_VAR_DECL,
     AST_VAR,
@@ -103,6 +104,7 @@ typedef struct ASTNode {
 
 //Definir nodos
 ASTNode* new_number(int value);
+ASTNode* new_id( const char* literal );
 ASTNode* new_str_literal( const char* literal );
 ASTNode* new_assign( const char* literal, ASTNode* value );
 ASTNode* new_var_decl( const char* name, ASTNode* value );
@@ -115,7 +117,7 @@ ASTNode* new_block_stmt( ASTNode** staments, size_t count );
 ASTNode* new_fun_def( const char* name, ASTNode* body);
 ASTNode* new_stmt( ASTNode* expression );
 ASTNode* new_return( ASTNode* expression );
-
+ASTNode* new_expr( ASTNode* expression );
 void free_ast(ASTNode* node);
 
 #endif

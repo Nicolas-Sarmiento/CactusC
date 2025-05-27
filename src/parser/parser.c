@@ -4,6 +4,9 @@
 #include "parser/tokenstream.h"
 #include "error_handler/error_handler.h"
 
+#include<stdio.h>
+#include "lexer/token.h"
+
 ParseResult parse_block( TokenStream* stream);
 ParseResult parse_stmt( TokenStream* stream);
 ParseResult parse_var_init( TokenStream* stream);
@@ -99,7 +102,6 @@ ParseResult parse_block( TokenStream* stream){
     return p_result;
 }
 
-
 ParseResult parse_stmt( TokenStream* stream){
     switch ( peek(stream).type)
     {
@@ -123,13 +125,13 @@ ParseResult parse_stmt( TokenStream* stream){
     default:
         break;
     }
-
+    printToken(peek(stream));
     ParseResult error = {
-        .result = { .code = ERR_SYNTAX, .message = "Invalid statement! "}
+        
+        .result = { .code = ERR_SYNTAX, .message = "Invalid statement! xd"}
     };
     return error;
 }
-
 
 ParseResult parse_var_init( TokenStream* stream){
     ParseResult p_result;
@@ -193,6 +195,7 @@ ParseResult parse_var_decl( TokenStream* stream){
         p_result.result = res;
         return p_result;
     }
+    advance(stream);
 
     ParseResult expr_res = parse_expr(stream); 
     if (expr_res.result.code != OK) {
@@ -232,7 +235,7 @@ ParseResult parse_if( TokenStream* stream){
         p_result.result = res;
         return p_result;
     }
-    
+    advance(stream);
     ASTNode* condition = NULL;
     ParseResult expr_res = parse_expr(stream); 
     if (expr_res.result.code != OK) {
@@ -281,7 +284,7 @@ ParseResult parse_while( TokenStream* stream){
         p_result.result = res;
         return p_result;
     }
-    
+    advance(stream);
     ASTNode* condition = NULL;
     ParseResult expr_res = parse_expr(stream); 
     if (expr_res.result.code != OK) {
@@ -333,7 +336,7 @@ ParseResult parse_return( TokenStream* stream){
         p_result.result = res;
         return p_result;
     }
-
+    advance(stream);
     ASTNode* expr_node = expr.node;
     ASTNode* return_node = new_return(expr_node);
     p_result.node = return_node;
@@ -366,13 +369,15 @@ ParseResult parse_print( TokenStream* stream){
         p_result.result = res;
         return p_result;
     }
-    
+    advance(stream);
     ASTNode* expr;
     Token tk = peek(stream);
     if( tk.type == TOKEN_NUMBER ){
         expr = new_number(tk.number);
     }else if ( tk.type == TOKEN_LITERAL ){
         expr = new_str_literal(tk.value);
+    }else if ( tk.type == TOKEN_ID ) {
+        expr = new_id(tk.value);
     }else{
         res = expect(stream, TOKEN_LITERAL);
         if (res.code != OK) {
@@ -389,40 +394,216 @@ ParseResult parse_print( TokenStream* stream){
     }
     advance(stream);
 
+    res = expect(stream, TOKEN_SMCL);
+    if (res.code != OK) {
+        p_result.result = res;
+        return p_result;
+    }
+    advance(stream);
+
     p_result.result.code = OK;
     p_result.node = expr;
     return p_result;
 }
 
 ParseResult parse_expr( TokenStream* stream){
-
+    return parse_expr_or(stream);
 }
 
 ParseResult parse_expr_or( TokenStream* stream){
+    ParseResult left = parse_expr_and(stream);
+    if (left.result.code != OK) return left;
 
+    while (peek(stream).type == TOKEN_OR) {
+        advance(stream);
+        ParseResult right = parse_expr_and(stream);
+        if (right.result.code != OK) {
+            free_ast(left.node);
+            return right;
+        }
+        ASTNode* node = new_binary_op("||", left.node, right.node);
+        left.node = node;
+    }
+
+    return left;
 }
 
 ParseResult parse_expr_and( TokenStream* stream){
+    ParseResult left = parse_equality(stream);
+    if (left.result.code != OK) return left;
 
+    while (peek(stream).type == TOKEN_AND) {
+        advance(stream);
+        ParseResult right = parse_equality(stream);
+        if (right.result.code != OK) {
+            free_ast(left.node);
+            return right;
+        }
+        ASTNode* node = new_binary_op("&&", left.node, right.node);
+        left.node = node;
+    }
+
+    return left;
 }
 
 ParseResult parse_equality( TokenStream* stream){
+    ParseResult left = parse_factor(stream);
+    if (left.result.code != OK) return left;
 
+    while (1) {
+        Token tok = peek(stream);
+        char* op;
+
+        if (tok.type == TOKEN_EQ) {
+            op = strdup("==");
+        } else if (tok.type == TOKEN_NEQ) {
+            op = strdup("!=");
+        } else if (tok.type == TOKEN_GT) {
+            op =  strdup(">");
+        } else {
+            break; 
+        }
+
+        advance(stream);
+
+        ParseResult right = parse_factor(stream);
+        if (right.result.code != OK) {
+            free_ast(left.node);
+            return right;
+        }
+
+        ASTNode* node = new_binary_op(op, left.node, right.node);
+
+        left.node = node; 
+    }
+
+    return left;
 }
 
 ParseResult parse_factor( TokenStream* stream){
+    ParseResult left = parse_term(stream);
+    if (left.result.code != OK) return left;
 
+    while (1) {
+        Token tok = peek(stream);
+        char* op;
+
+        if (tok.type == TOKEN_PLUS) {
+            op = strdup("+");
+        } else if (tok.type == TOKEN_MINUS) {
+            op = strdup("-");
+        }  else {
+            break; 
+        }
+
+        advance(stream);
+
+        ParseResult right = parse_term(stream);
+        if (right.result.code != OK) {
+            free_ast(left.node);
+            return right;
+        }
+
+        ASTNode* node = new_binary_op(op, left.node, right.node);
+
+        left.node = node; 
+    }
+
+    return left;
 }
 
 ParseResult parse_term( TokenStream* stream){
+    ParseResult left = parse_unary(stream);
+    if (left.result.code != OK) return left;
 
+    while (1) {
+        Token tok = peek(stream);
+        char* op;
+
+        if (tok.type == TOKEN_TIMES) {
+            op = strdup("*");
+        } else if (tok.type == TOKEN_DIV) {
+            op = strdup("/");
+        }  else {
+            break; 
+        }
+
+        advance(stream);
+
+        ParseResult right = parse_unary(stream);
+        if (right.result.code != OK) {
+            free_ast(left.node);
+            return right;
+        }
+
+        ASTNode* node = new_binary_op(op, left.node, right.node);
+
+        left.node = node; 
+    }
+
+    return left;
 }
 
 ParseResult parse_unary( TokenStream* stream){
+    Token tok = peek(stream);
 
+    if (tok.type == TOKEN_MINUS || tok.type == TOKEN_NOT) {
+        advance(stream);
+
+        printf("N\n");
+        ParseResult right = parse_unary(stream);
+        if (right.result.code != OK) return right;
+
+        char op;
+        if (tok.type == TOKEN_MINUS){
+            op = '-';
+        }
+        else{
+            op = '!';
+        }
+        ASTNode* node = new_unary_op(op, right.node);
+
+        ParseResult result = { .result.code = OK, .node = node };
+        return result;
+    }
+
+    return parse_primary(stream); 
 }
 
 ParseResult parse_primary( TokenStream* stream){
+    ParseResult p_result;
+    Token tk = peek(stream);
 
+    ASTNode* node;
+    switch (tk.type)
+    {
+    case TOKEN_NUMBER :
+        node = new_number(tk.number);
+        break;
+    case TOKEN_ID :
+        node = new_id(tk.value);
+        break;
+    case TOKEN_LP:
+        advance(stream);
+        ParseResult result = parse_expr(stream);
+        if( result.result.code != OK ) return result;
+        Result r = expect(stream, TOKEN_RP);
+        if ( r.code != OK ){
+            p_result.result = r;
+            return p_result;
+        }
+        
+        node = new_expr(result.node);
+        break;
+    default:
+        printToken(tk);
+        p_result.result.code = ERR_SYNTAX;
+        stpcpy(p_result.result.message, "Invalid token found! sx");
+        return p_result;
+    }
+    advance(stream);
+    p_result.node = node;
+    p_result.result.code = OK;
+    return p_result;
 }
 

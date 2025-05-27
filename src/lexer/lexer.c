@@ -73,7 +73,11 @@ Result lexer(char** lines,const int line_count,  Token** tokenList, size_t* size
                 tmp[ix] = '\0';
                 Token_type type = getTokenType(tmp);
                 if( type == INVALID_TOKEN ){
-                    printf("invalid %s\n", tmp);
+                    Result r;
+                    r.code = ERR_LEXICAL;
+                    char * base = "Unexpectede token at line ";
+                    sprintf(r.message, "%s%d", base, i+1);
+                    return r;
                 }
                 (*tokenList)[token_pos++].type = type;
 

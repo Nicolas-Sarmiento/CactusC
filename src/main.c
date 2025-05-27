@@ -34,18 +34,22 @@ int main(int argc, char * argv[]){
     return 1;
   }
 
+  // for(size_t i = 0; i < num_tokens; i++){
+  //   printToken(tokens[i]);
+  // }
+
   TokenStream stream;
   stream.tokens = tokens;
   stream.pos = 0;
   stream.lenght = num_tokens;
   
   
-  ParseResult ast = parse_program(&stream);
-  if( ast.result.code != OK ){
-    print_error_message(ast.result);
+  ParseResult root = parse_program(&stream);
+  if( root.result.code != OK ){
+    print_error_message(root.result);
   }
 
-
+  free_ast(root.node);
   free(tokens); 
   free_lines(source_lines, lines);
   return 0;
