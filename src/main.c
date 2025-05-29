@@ -6,7 +6,7 @@
 #include "lexer/token.h"
 #include "parser/tokenstream.h"
 #include "parser/parser.h"
-#include "semantic_analysis/symbol_table.h"
+#include "semantic_analysis/semantic.h"
 
 int main(int argc, char * argv[]){
   if( argc != 3 ){
@@ -48,7 +48,17 @@ int main(int argc, char * argv[]){
   ParseResult root = parse_program(&stream);
   if( root.result.code != OK ){
     print_error_message(root.result);
+    free(tokens);
+    free_lines(source_lines, lines);
+    return 1;
   }
+
+  SemanticResult semantic_result = semantic_check(root.node);
+  
+  if( !semantic_result.is_correct ){
+    print_error_list(semantic_result.error_list);
+  }
+
 
   free_ast(root.node);
   free(tokens); 
