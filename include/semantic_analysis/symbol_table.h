@@ -12,6 +12,7 @@ typedef struct symbol {
     struct symbol* next;
 } Symbol;
 
+
 void insert_symbol( Symbol** table, char* name, SymbolType type);
 SymbolType look_up_symbol( Symbol* table, char* name );
 
