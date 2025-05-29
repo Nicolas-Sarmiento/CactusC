@@ -211,7 +211,7 @@ ParseResult parse_var_decl( TokenStream* stream){
     }
     advance(stream);
 
-    ASTNode* node = new_var_decl(name, init_expr);
+    ASTNode* node = new_assign(name, init_expr);
 
     p_result.result.code = OK;
     p_result.node = node;
