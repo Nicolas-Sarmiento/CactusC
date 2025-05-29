@@ -6,6 +6,7 @@
 #include "lexer/token.h"
 #include "parser/tokenstream.h"
 #include "parser/parser.h"
+#include "semantic_analysis/symbol_table.h"
 
 int main(int argc, char * argv[]){
   if( argc != 3 ){
