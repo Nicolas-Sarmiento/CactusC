@@ -19,7 +19,7 @@ set(SOURCES
     src/parser/tokenstream.c
     src/semantic_analysis/semantic.c
     src/semantic_analysis/symbol_table.c
-
+    src/codegen/codegen.c
 )
 
 

@@ -7,6 +7,7 @@
 #include "parser/tokenstream.h"
 #include "parser/parser.h"
 #include "semantic_analysis/semantic.h"
+#include "codegen/codegen.h"
 
 int main(int argc, char * argv[]){
   if( argc != 3 ){
@@ -16,6 +17,7 @@ int main(int argc, char * argv[]){
 
   char *source_name = argv[1];
   char *output_name = argv[2];
+  char *EXT = ".bcode";
 
   printf("Compiling %s to %s\n", source_name, output_name);
 
@@ -57,9 +59,28 @@ int main(int argc, char * argv[]){
   
   if( !semantic_result.is_correct ){
     print_error_list(semantic_result.error_list);
+    free_ast(root.node);
+    free(tokens); 
+    free_lines(source_lines, lines);
+    return 1;
   }
 
-
+  printf("================ CODE GEN ===================\n");
+  int len = snprintf(NULL, 0, "%s%s", output_name, EXT );
+  char* out_file = malloc( len + 1);
+  if ( out_file ){
+    snprintf(out_file, len + 1, "%s%s", output_name, EXT);
+  }else{
+    printf("Error: allocating memory\n");
+    free_ast(root.node);
+    free(tokens); 
+    free_lines(source_lines, lines);
+    return 1;
+  }
+  FILE* out = fopen(out_file,"w");
+  generate_stmt(root.node, out);
+  
+  fclose(out);
   free_ast(root.node);
   free(tokens); 
   free_lines(source_lines, lines);
