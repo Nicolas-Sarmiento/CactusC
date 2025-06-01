@@ -125,7 +125,7 @@ ParseResult parse_stmt( TokenStream* stream){
     default:
         break;
     }
-    printToken(peek(stream));
+
     ParseResult error = {
         
         .result = { .code = ERR_SYNTAX, .message = "Invalid statement! xd"}
@@ -372,20 +372,17 @@ ParseResult parse_print( TokenStream* stream){
     advance(stream);
     ASTNode* expr;
     Token tk = peek(stream);
-    if( tk.type == TOKEN_NUMBER ){
-        expr = new_number(tk.number);
-    }else if ( tk.type == TOKEN_LITERAL ){
+    if( tk.type == TOKEN_LITERAL ){
         expr = new_str_literal(tk.value);
-    }else if ( tk.type == TOKEN_ID ) {
-        expr = new_id(tk.value);
-    }else{
-        res = expect(stream, TOKEN_LITERAL);
-        if (res.code != OK) {
-            p_result.result = res;
-            return p_result;
+        advance(stream);
+    }else {
+        ParseResult r = parse_expr(stream);
+        if( r.result.code != OK ){
+            return r;
         }
+        expr = r.node;
     }
-    advance(stream);
+    
  
     res = expect(stream, TOKEN_RP);
     if (res.code != OK) {
@@ -402,7 +399,8 @@ ParseResult parse_print( TokenStream* stream){
     advance(stream);
 
     p_result.result.code = OK;
-    p_result.node = expr;
+    ASTNode* print_node = new_print(expr);
+    p_result.node = print_node;
     return p_result;
 }
 
@@ -596,9 +594,8 @@ ParseResult parse_primary( TokenStream* stream){
         node = new_expr(result.node);
         break;
     default:
-        printToken(tk);
         p_result.result.code = ERR_SYNTAX;
-        stpcpy(p_result.result.message, "Invalid token found! sx");
+        stpcpy(p_result.result.message, "Invalid token found! Expected an ID, Number o valid expression");
         return p_result;
     }
     advance(stream);
