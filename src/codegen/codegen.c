@@ -57,8 +57,8 @@ void generate_expr( ASTNode* node, FILE* out ){
             break;
         }
         case AST_UNARY_OP:
+            fprintf(out, "PUSH 0\n");   
             generate_expr(node->unary_op.operand, out);
-            fprintf(out, "PUSH 0\n");
             if( node->unary_op.op == '-'){
                 fprintf(out, "SUB\n");
             }else if ( node->unary_op.op == '!'){
