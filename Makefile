@@ -1,8 +1,14 @@
-.PHONY: build clean 
+.PHONY:  build clean
 
-build: 
-	cmake -B build
-	cmake --build build
+BUILD_DIR := build
+
+
+build:
+	@mkdir -p $(BUILD_DIR)
+	cmake -S . -B $(BUILD_DIR)
+	cmake --build $(BUILD_DIR)
+
+
 
 clean:
-	rm -rf build
+	rm -rf $(BUILD_DIR)
