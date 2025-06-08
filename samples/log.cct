@@ -1,0 +1,10 @@
+int main(){
+    int number = 20;
+    int counter = 0;
+    while ( number ){
+        number = number / 2;
+        counter = counter + 1;
+    }
+    print(counter);
+    return 0;
+}

@@ -54,6 +54,5 @@ dkms.conf
 #build path
 build/
 
-/samples
 /out
 /.vscode

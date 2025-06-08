@@ -1,0 +1,13 @@
+int main(){
+    int fib1 = 1;
+    int fib2 = 1;
+    int counter = 0;
+    while ( 10 > counter || counter == 10 ){
+        print(fib1);
+        int aux = fib1;
+        fib1 = fib1 + fib2;
+        fib2 = aux;
+        counter = counter + 1;
+    }
+    return 0;
+}

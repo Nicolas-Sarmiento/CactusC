@@ -1,0 +1,14 @@
+int main(){
+    print("Hello");
+    int i = 10;
+    int b = 5 + 8 * 10 || 1;
+    print(b);
+    while( i > 0 || i == 0 ){
+        print(i);
+        i = i - 1;
+    }
+    if( i > 0 ){
+        print("No");
+    }
+    return 0;
+}

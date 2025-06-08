@@ -1,0 +1,6 @@
+int main(){
+    print("CactusC");
+    print("is");
+    print("AWESOME!!!");
+    return 0;
+}

@@ -61,7 +61,6 @@ void semantic_check_node(ASTNode* root, Symbol** table , ErrorList** errors){
     case AST_VAR_DECL:
         if ( look_up_symbol( *table,root->assign.name) == INT ){
             char msg [1023];
-            printf("Hello?\n");
             snprintf(msg, sizeof(msg), "Error: %s variable is already defined!", root->assign.name);
             add_error(errors, msg );
         }else{
@@ -91,7 +90,7 @@ void semantic_check_node(ASTNode* root, Symbol** table , ErrorList** errors){
         break;
     case AST_WHILE:
         semantic_check_node(root->while_stmt.condition, table, errors);
-        semantic_check_node(root->while_stmt.condition, table, errors);
+        semantic_check_node(root->while_stmt.body, table, errors);
         break;
     case AST_PRINT:
         semantic_check_node(root->print_stmt.expr, table, errors);

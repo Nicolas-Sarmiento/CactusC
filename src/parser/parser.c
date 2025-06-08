@@ -547,8 +547,7 @@ ParseResult parse_unary( TokenStream* stream){
 
     if (tok.type == TOKEN_MINUS || tok.type == TOKEN_NOT) {
         advance(stream);
-
-        printf("N\n");
+        
         ParseResult right = parse_unary(stream);
         if (right.result.code != OK) return right;
 
